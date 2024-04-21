@@ -5,6 +5,7 @@ import Person.Passenger;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 public class BookingManager {
 
@@ -14,6 +15,16 @@ public class BookingManager {
     public BookingManager (AirLineManager airLineManager){
         this.airLineManager = airLineManager;
         this.flightsBook = new HashMap<>();
+    }
+
+    private List<Flight> getAllFlights (){
+        return getAirLineManager().getAirLineGroups().stream()
+                .flatMap(airLine -> airLine.getAllFlights().stream())
+                .toList();
+    }
+
+    private AirLineManager getAirLineManager(){
+        return this.airLineManager;
     }
 
 

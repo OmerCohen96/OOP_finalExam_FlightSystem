@@ -1,6 +1,5 @@
 package flights_manager;
 
-import Person.Passenger;
 import flights_manager.airlines_component.AirLine;
 import flights_manager.airlines_component.GroupAirLine;
 import flights_manager.airlines_component.SingularAirLine;
@@ -9,13 +8,13 @@ import java.util.*;
 
 public class AirLineManager {
     private final Set<AirLine> airLineGroups;
-    private final String airPortName;
-    private final Map<Integer, List<Passenger>> flightsMap;
+//    private final String airPortName;
+//    private final Map<Integer, List<Passenger>> flightsMap;
 
-    public AirLineManager(String airPortName){
-        this.airPortName = airPortName;
+    public AirLineManager(){
+//        this.airPortName = airPortName;
         this.airLineGroups = new HashSet<>();
-        this.flightsMap =  new HashMap<>();
+//        this.flightsMap =  new HashMap<>();
     }
 
     public void addAirLineGroup (AirLine ... airLineGroup){
@@ -30,7 +29,7 @@ public class AirLineManager {
             airLine = getAirLineComponent(compName);
             if (airLine != null){
                 airLine.addFlight(flight);
-                getFlightsMap().put(flight.getFlight_code(), new ArrayList<>());
+//                getFlightsMap().put(flight.getFlight_code(), new ArrayList<>());
             } else {
                 throw new NoSuchElementException(
                         String.format("""
@@ -63,13 +62,13 @@ public class AirLineManager {
         return allAirLines;
     }
 
-    public Map<Integer, List<Passenger>> getFlightsMap() {
-        return flightsMap;
-    }
+//    public Map<Integer, List<Passenger>> getFlightsMap() {
+//        return flightsMap;
+//    }
 
-    public String getAirPortName(){
-        return this.airPortName;
-    }
+//    public String getAirPortName(){
+//        return this.airPortName;
+//    }
 
     public static void main(String[] args) {
         GroupAirLine airFrance = new GroupAirLine("AirFrance");
@@ -88,7 +87,7 @@ public class AirLineManager {
         ELAL.addSubAirLines(israir, arkia);
         airFrance.addSubAirLines(KLM, transavia, littleFrance);
         international.addSubAirLines(ELAL);
-        AirLineManager manager = new AirLineManager("Namal teofa Ben Gorion");
+        AirLineManager manager = new AirLineManager();
         manager.addAirLineGroup(airFrance,ELAL, international, japanAirways, airChina);
 
         Flight flight1
