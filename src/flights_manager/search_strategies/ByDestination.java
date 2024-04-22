@@ -6,9 +6,9 @@ import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
 
-public class ByDestinationStrategy implements SearchStrategy {
+public class ByDestination implements SearchStrategy {
 
-    private Scanner scanner = new Scanner(System.in);
+    Scanner scanner = new Scanner(System.in);
 
     @Override
     public List<Flight> search(List<Flight> source) {

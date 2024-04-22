@@ -6,7 +6,7 @@ import my_date_format.MyDate;
 import java.util.List;
 import java.util.Scanner;
 
-public class ByDateStrategy implements SearchStrategy{
+public class ByDate implements SearchStrategy{
     Scanner scanner = new Scanner(System.in);
 
     @Override

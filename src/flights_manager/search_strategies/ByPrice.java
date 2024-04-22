@@ -4,12 +4,11 @@ import flights_manager.Flight;
 
 import java.util.InputMismatchException;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Scanner;
 
-public class ByPriceStrategy implements SearchStrategy {
+public class ByPrice implements SearchStrategy {
 
-    private final Scanner scanner = new Scanner(System.in);
+    Scanner scanner = new Scanner(System.in);
 
     @Override
     public List<Flight> search(List<Flight> source) {
