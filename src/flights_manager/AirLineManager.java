@@ -21,6 +21,7 @@ public class AirLineManager {
         this.airLineGroups.addAll(Arrays.asList(airLineGroup));
     }
 
+    // TODO: 24/04/2024 move to BookingManager
     public void addNewFlight (Flight ... flights){
         String compName;
         AirLine airLine;
