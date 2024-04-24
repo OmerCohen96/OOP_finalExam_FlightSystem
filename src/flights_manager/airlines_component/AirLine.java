@@ -43,7 +43,9 @@ public abstract class AirLine {
     }
 
     public void addFlight(Flight... flightList) {
-        flights.addAll(Arrays.asList(flightList));
+        for (Flight flight : flightList)
+            if (!getAllFlights().contains(flight))
+                getDepartingFlights().add(flight);
     }
 
     public void removeFlight(Flight flight) {

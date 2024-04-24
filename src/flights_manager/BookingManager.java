@@ -1,5 +1,6 @@
 package flights_manager;
 
+import flights_manager.airlines_component.AirLine;
 import flights_manager.client_handle.FlightObserver;
 import flights_manager.client_handle.FlightsNewsletter;
 import flights_manager.client_handle.Passenger;
@@ -23,10 +24,33 @@ public class BookingManager implements FlightsNewsletter, PassengerServiceFacade
         this.observers = new ArrayList<>();
     }
 
+//    public void addNewFlight(Flight ... flights){
+//        getAirLineManager().addNewFlight(flights);
+//        for (Flight flight : flights){
+//            getMap().put(flight, new ArrayList<>());
+//        }
+//    }
+
     public void addNewFlight(Flight ... flights){
-        getAirLineManager().addNewFlight(flights);
+        String compName;
+        AirLine airLine;
         for (Flight flight : flights){
-            getMap().put(flight, new ArrayList<>());
+            compName = flight.getCompName();
+            airLine = getAirLineManager().getAirLineComponent(compName);
+            if (airLine != null){
+                airLine.addFlight(flight);
+                if (!getMap().containsKey(flight)){
+                    getMap().put(flight, new ArrayList<>());
+                    // TODO: 24/04/2024 add notify fo observers
+                }
+            } else {
+                throw new NoSuchElementException(
+                        String.format("""
+                                        There is no such company %s 
+                                        for insert a new flight, the Company name field must-
+                                        related with name from the airlines pool""",
+                                compName));
+            }
         }
     }
 
@@ -37,12 +61,38 @@ public class BookingManager implements FlightsNewsletter, PassengerServiceFacade
             return new Ticket(flight);
         }
         else
-            throw new NoSuchElementException("Cant find flight with this Serial Number");
+            throw new NoSuchElementException("We couldn't find a flight with this serial number");
     }
 
-    // TODO: 22/04/2024  accomplish search in run time
     public void searchFlight (){
+        Scanner scanner = new Scanner(System.in);
         SearchMethod[] methods = SearchMethod.values();
+        List<SearchMethod> chosenMethods = new ArrayList<>();
+        System.out.println("Please indicate the categories you'd like to search by.\n" +
+                "Enter 'true' to include a category or 'false' to dismiss it");
+        boolean isValid;
+        for (SearchMethod method : methods){
+            System.out.printf("Search %s ?%n", method);
+            isValid = false;
+            while (!isValid) {
+                try
+                {
+                    if (scanner.nextBoolean())
+                        chosenMethods.add(method);
+                    isValid = true;
+                }
+                catch (NoSuchElementException o)
+                {
+                    System.out.println("Please follow the instructions \n" +
+                            "Enter 'true' to include a category or 'false' to dismiss it.");
+                }
+            }
+        }
+        List<Flight> results = this.search(chosenMethods.toArray(SearchMethod[]::new));
+        if (results != null)
+            results.forEach(System.out::println);
+        else
+            System.out.println("We couldn't find any matching flights. We apologize for the inconvenience.");
     }
 
     public List<Flight> search(SearchMethod... searchMethods){
@@ -103,6 +153,11 @@ public class BookingManager implements FlightsNewsletter, PassengerServiceFacade
 
     @Override
     public void notifyAllObserver(String message) {
+
+    }
+
+    @Override
+    public void notifyAllPassengers(Flight flight, String message) {
 
     }
 }
