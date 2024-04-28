@@ -1,4 +1,4 @@
-package flights_manager;
+package flights_manager.airlines_component;
 
 import my_date_format.MyDate;
 
@@ -11,35 +11,35 @@ import my_date_format.MyDate;
 public class Flight {
 
     private static int SERIAL_NUMBER = 1;
-    private final String from; // final because if the dest/source changes it will be considered as another/new flight
+    private final int flight_code;
+    private final String origin; // final because if the dest/source changes it will be considered as another/new flight
     private final String destination;
-    private final String airLineComp; // final cause the same reason above
+    private final String airLineName; // final cause the same reason above
     private MyDate departureTime;
     private MyDate arrivalTime;
     private double price;
-    private final int Flight_code;
 
-    public Flight(String airLineComp, String from, String destination, MyDate departureTime, MyDate arrivalTime, double price) {
-        this.airLineComp = airLineComp;
-        this.from = from;
+    public Flight(String airLineName, String origin, String destination, MyDate departureTime, MyDate arrivalTime, double price) {
+        this.airLineName = airLineName;
+        this.origin = origin;
         this.destination = destination;
         this.departureTime = departureTime;
         this.arrivalTime = arrivalTime;
         this.price = price;
-        this.Flight_code = SERIAL_NUMBER++;
+        this.flight_code = SERIAL_NUMBER++;
     }
 
-    public Flight(String airLineComp, String from, String destination,
+    public Flight(String airLineName, String origin, String destination,
                   String departureTime, String arrivalTime, double price) {
-        this(airLineComp, from, destination, MyDate.of(departureTime), MyDate.of(arrivalTime), price);
+        this(airLineName, origin, destination, MyDate.of(departureTime), MyDate.of(arrivalTime), price);
     }
 
     public String getCompName() {
-        return airLineComp;
+        return airLineName;
     }
 
-    public String getFrom() {
-        return from;
+    public String getOrigin() {
+        return origin;
     }
 
     public String getDestination() {
@@ -71,7 +71,7 @@ public class Flight {
     }
 
     public int getFlight_code(){
-        return this.Flight_code;
+        return this.flight_code;
     }
 
     @Override
@@ -85,7 +85,7 @@ public class Flight {
                         Arrival Time: %s
                         Cost: %.2f
                         """,
-                Flight_code, getCompName(), getFrom(), getDestination(), getDepartureTime(), getArrivalTime(),
+                flight_code, getCompName(), getOrigin(), getDestination(), getDepartureTime(), getArrivalTime(),
                 getPrice());
     }
 

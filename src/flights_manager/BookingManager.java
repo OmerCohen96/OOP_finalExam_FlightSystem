@@ -1,6 +1,7 @@
 package flights_manager;
 
 import flights_manager.airlines_component.AirLine;
+import flights_manager.airlines_component.Flight;
 import flights_manager.client_handle.FlightObserver;
 import flights_manager.client_handle.FlightsNewsletter;
 import flights_manager.client_handle.Passenger;
@@ -9,19 +10,28 @@ import flights_manager.search_strategies.SearchFactory;
 import flights_manager.search_strategies.SearchMethod;
 import flights_manager.search_strategies.SearchStrategy;
 import flights_manager.client_handle.PassengerServiceFacade;
+import my_date_format.MyDate;
+
 import java.util.*;
 
-// TODO: 24/04/2024 make it static class
 public class BookingManager implements FlightsNewsletter, PassengerServiceFacade {
 
-    final AirLineManager airLineManager;
-    final Map<Flight , List<Passenger>> flightsBook;
-    final private List<FlightObserver> observers;
+    private static BookingManager bookingManager = null;
 
-    public BookingManager (AirLineManager airLineManager){
-        this.airLineManager = airLineManager;
+    public static BookingManager getInstance() {
+        if (bookingManager == null)
+            bookingManager = new BookingManager();
+        return bookingManager;
+    }
+
+    final AirLineManager airLineManager;
+    final Map<Flight, List<Passenger>> flightsBook;
+    final private Set<FlightObserver> flightObservers;
+
+    private BookingManager (){
+        this.airLineManager = AirLineManager.getInstance();
         this.flightsBook = new HashMap<>();
-        this.observers = new ArrayList<>();
+        this.flightObservers = new HashSet<>();
     }
 
 //    public void addNewFlight(Flight ... flights){
@@ -36,7 +46,7 @@ public class BookingManager implements FlightsNewsletter, PassengerServiceFacade
         AirLine airLine;
         for (Flight flight : flights){
             compName = flight.getCompName();
-            airLine = getAirLineManager().getAirLineComponent(compName);
+            airLine = getAirLineManager().findAirLineComponent(compName);
             if (airLine != null){
                 airLine.addFlight(flight);
                 if (!getMap().containsKey(flight)){
@@ -46,22 +56,12 @@ public class BookingManager implements FlightsNewsletter, PassengerServiceFacade
             } else {
                 throw new NoSuchElementException(
                         String.format("""
-                                        There is no such company %s 
+                                        There is no such company %s
                                         for insert a new flight, the Company name field must-
                                         related with name from the airlines pool""",
                                 compName));
             }
         }
-    }
-
-    public Ticket purchaseTicket (int serialNumber, Passenger passenger){
-        Flight flight = getFlightByCode(serialNumber);
-        if (flight != null) {
-            addNewPassenger(flight, passenger);
-            return new Ticket(flight);
-        }
-        else
-            throw new NoSuchElementException("We couldn't find a flight with this serial number");
     }
 
     public void searchFlight (){
@@ -95,7 +95,7 @@ public class BookingManager implements FlightsNewsletter, PassengerServiceFacade
             System.out.println("We couldn't find any matching flights. We apologize for the inconvenience.");
     }
 
-    public List<Flight> search(SearchMethod... searchMethods){
+    private List<Flight> search(SearchMethod... searchMethods){
         List<Flight> results = getAllFlights();
         SearchStrategy searchStrategy;
         for (SearchMethod method : searchMethods){
@@ -105,12 +105,22 @@ public class BookingManager implements FlightsNewsletter, PassengerServiceFacade
         return results;
     }
 
-    public Flight getFlightByCode (int serialNumber){
+    public Ticket purchaseTicket (int flightSerialNumber, Passenger passenger){
+        Flight flight = getFlightByCode(flightSerialNumber);
+        if (flight != null) {
+            addPassenger(flight, passenger);
+            return new Ticket(flight);
+        }
+        else
+            throw new NoSuchElementException("We couldn't find a flight with this serial number");
+    }
+
+    private Flight getFlightByCode (int serialNumber){
         return getAllFlights().stream()
                 .filter(flight -> flight.getFlight_code() == serialNumber)
                 .findFirst().orElse(null);
     }
-    public void addNewPassenger (Flight flight , Passenger passenger){
+    public void addPassenger(Flight flight , Passenger passenger){
         getMap().get(flight).add(passenger);
     }
 
@@ -118,7 +128,7 @@ public class BookingManager implements FlightsNewsletter, PassengerServiceFacade
         return this.flightsBook;
     }
 
-    private List<Flight> getAllFlights (){
+    public List<Flight> getAllFlights (){
         return getAirLineManager().getAirLineGroups().stream()
                 .flatMap(airLine -> airLine.getAllFlights().stream())
                 .toList();
@@ -128,36 +138,60 @@ public class BookingManager implements FlightsNewsletter, PassengerServiceFacade
         return this.airLineManager;
     }
 
-    // TODO: 24/04/2024
-    public void updateFlightTime (Flight flight){
+    // TODO: 24/04/2024 more detailed
+    public void updateTimeFlight (Flight flight, MyDate newDepartTime, MyDate newArrvlTime){
+        String oldFlight = flight.toString();
+        if (!flight.getDepartureTime().equals(newDepartTime))
+            flight.setDepartureTime(newDepartTime);
+        if (!flight.getArrivalTime().equals(newArrvlTime))
+            flight.setArrivalTime(newArrvlTime);
+        String message = String.format( // TODO: 24/04/2024  expaned the message
+                "the time of flight number #%d has been changed", flight.getFlight_code());
+        notifyAllPassengers(flight, message);
+        notifyAllObserver(message);
 
+    }
 
-        getMap().get(flight).forEach(passenger -> passenger.updateFlightStatus("sas"));
+    public void updateTimeFlight (Flight flight, MyDate newDepartTime){
+        updateTimeFlight(flight, newDepartTime, flight.getArrivalTime());
     }
 
     // TODO: 24/04/2024
-    public void canceledFlight (Flight flight){
-
+    public void cancelFlight (Flight flight){
+        String canceledFlight = flight.toString();
+        String message = String.format(
+                "Flight details:\n%s\thas been canceled, we sorry", canceledFlight
+        );
+        AirLine airLine = getAirLineManager().findAirLineComponent(flight.getCompName());
+        notifyAllPassengers(flight,message);
+        notifyAllObserver(message);
+        airLine.removeFlight(flight);
+        getMap().remove(flight);
     }
 
+    private Set<FlightObserver> getFlightObservers(){
+        return this.flightObservers;
+    }
 
     @Override
     public void subscribe(FlightObserver observer) {
-
+        getFlightObservers().add(observer);
     }
 
     @Override
     public void unsubscribe(FlightObserver observer) {
-
+        getFlightObservers().remove(observer);
     }
 
     @Override
     public void notifyAllObserver(String message) {
-
+        for (FlightObserver observer : getFlightObservers())
+            observer.update(message);
     }
 
     @Override
     public void notifyAllPassengers(Flight flight, String message) {
-
+        for (Passenger passenger : getMap().get(flight))
+            passenger.update(message);
     }
 }

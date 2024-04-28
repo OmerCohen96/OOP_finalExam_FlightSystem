@@ -1,6 +1,6 @@
 package flights_manager.client_handle;
 
-import flights_manager.Flight;
+import flights_manager.airlines_component.Flight;
 
 public interface FlightsNewsletter {
     void subscribe (FlightObserver observer);

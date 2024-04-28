@@ -1,7 +1,5 @@
 package flights_manager.airlines_component;
 
-import flights_manager.Flight;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -25,11 +23,11 @@ public class GroupAirLine extends AirLine {
     @Override
     public List<Flight> getAllFlights() {
         if (this.subsidiary.size() == 0)
-            return new ArrayList<>(getDepartingFlights());
+            return new ArrayList<>(getInternalFlights());
         else
             return Stream.concat(getAllCompanies().stream().filter(
                     x -> !x.equals(this)).flatMap( x -> x.getAllFlights().stream()), // concat all the flights of
-                    getDepartingFlights().stream()).toList();                       // of the subsidiary air lines
+                    getInternalFlights().stream()).toList();                       // of the subsidiary air lines
     }                                                                               // with the current company flights
 
     @Override
@@ -45,7 +43,7 @@ public class GroupAirLine extends AirLine {
         this.subsidiary.addAll(Arrays.asList(subAirLine));
     }
 
-    public void removeSubsidiaryAirLine(AirLine subAirLine) {
+    public void removeSubAirLine(AirLine subAirLine) {
         this.subsidiary.remove(subAirLine);
     }
 

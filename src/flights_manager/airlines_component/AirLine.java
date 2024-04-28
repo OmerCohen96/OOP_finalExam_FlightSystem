@@ -1,9 +1,6 @@
 package flights_manager.airlines_component;
 
-import flights_manager.Flight;
-
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -38,14 +35,14 @@ public abstract class AirLine {
 
     // return the flights belonging to the current instance only (ignore descendants airlines flights)
     // for inner use only
-    protected List<Flight> getDepartingFlights() {
+    protected List<Flight> getInternalFlights() {
         return this.flights;
     }
 
     public void addFlight(Flight... flightList) {
         for (Flight flight : flightList)
             if (!getAllFlights().contains(flight))
-                getDepartingFlights().add(flight);
+                getInternalFlights().add(flight);
     }
 
     public void removeFlight(Flight flight) {

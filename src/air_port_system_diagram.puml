@@ -1,0 +1,76 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+
+BookingManager *- AirLineManager
+AirLineManager o- AirLine
+AirLine <|-- GroupAirLine
+AirLine <|-- SingularAirLine
+AirLine o-- Flight
+Flight *-- MyDate
+
+class BookingManager{
+    -AirLineManager
+    -Map<Flight,Passengers[ ]> flightsBook
+    -flightObservers [ ]
+    +addNewFlight()
+
+    +purchaseTicket()
+}
+
+class AirLineManager{
+    -airLineGroups [ ]
+    +{static}Static getInstance()
+    +addAirLineGroup()
+    +getAirLineGroups()
+    +findAirLineGroup()
+    +removeAirLineGroup()
+    +getAirLineComponent()
+    +findAirLineComponent()
+}
+
+abstract AirLine {
+    -companyName
+    -flights [ ]
+
+    #getInternalFlights()
+    +getCompanyName()
+    +removeFlight()
+    +addFlight()
+    + {abstract} getAllFlights()
+    + {abstract}  getAllcompanies()
+}
+
+class GroupAirLine {
+    -subsidiaryAirLines [ ]
+    +addSubsidiary()
+    +removeSubsidiary()
+}
+
+class SingularAirLine
+
+class Flight{
+    -{static}SERIAL_NUMBER
+    -flight_code
+    -origin
+    -destination
+    -airLineName
+    -departureTime
+    -arrivalTime
+    -double price
+    --
+    simple Getters&Setters
+}
+
+class MyDate{
+    - LocalDateTime
+    +{static}MyDate of(String)
+    +{static}boolean isValid(String)
+    +equals()
+    +equalsByDate()
+    +isAfter()
+    +isBefore()
+}
+
+
+@enduml

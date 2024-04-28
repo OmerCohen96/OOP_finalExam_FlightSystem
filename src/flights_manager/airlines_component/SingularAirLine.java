@@ -1,7 +1,5 @@
 package flights_manager.airlines_component;
 
-import flights_manager.Flight;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,7 +17,7 @@ public class SingularAirLine extends AirLine {
 
     @Override
     public List<Flight> getAllFlights() {
-        return new ArrayList<>(getDepartingFlights());
+        return new ArrayList<>(getInternalFlights());
     }
 
     @Override

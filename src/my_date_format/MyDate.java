@@ -189,13 +189,4 @@ public class MyDate implements Comparable<MyDate> {
         return myDate.format(formatter);
     }
 
-    public static void main(String[] args) {
-        MyDate date1 = MyDate.of("02/03/24");
-        MyDate date2 = MyDate.of("5/03/2024 8:18");
-        System.out.println(MyDate.isValid("31/02/53 5:41"));
-
-        System.out.println(date2.isAfter(date1));
-
-
-    }
 }

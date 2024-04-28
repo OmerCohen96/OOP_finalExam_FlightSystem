@@ -1,6 +1,6 @@
 package flights_manager.search_strategies;
 
-import flights_manager.Flight;
+import flights_manager.airlines_component.Flight;
 
 import java.util.InputMismatchException;
 import java.util.List;
