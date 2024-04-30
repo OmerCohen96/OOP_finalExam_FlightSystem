@@ -1,10 +1,10 @@
-import controlers.AirLineManager;
-import controlers.BookingManager;
-import controlers.Flight;
-import controlers.GroupAirLine;
-import controlers.SingularAirLine;
-import controlers.observer_components.FlightObserver;
-import controlers.observer_components.Passenger;
+import flight_management.AirLineManager;
+import flight_management.BookingManager;
+import flight_management.Flight;
+import flight_management.GroupAirLine;
+import flight_management.SingularAirLine;
+import flight_management.clients_components.FlightObserver;
+import flight_management.clients_components.Passenger;
 import my_date_format.MyDate;
 
 import java.util.Comparator;

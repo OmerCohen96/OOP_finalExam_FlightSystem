@@ -1,9 +1,9 @@
-import controlers.AirLineManager;
-import controlers.BookingManager;
-import controlers.AirLine;
-import controlers.Flight;
-import controlers.GroupAirLine;
-import controlers.SingularAirLine;
+import flight_management.AirLineManager;
+import flight_management.BookingManager;
+import flight_management.AirLine;
+import flight_management.Flight;
+import flight_management.GroupAirLine;
+import flight_management.SingularAirLine;
 
 import java.util.List;
 
@@ -35,17 +35,15 @@ public class TryMain {
         airLineManager.addAirLineGroup(airFrance);
         bookingManager.addNewFlight(flight1,flight2,flight3,flight4,flight5);
 
-        List<Flight> blabla = airFrance.getAllFlights();
 
 
 
-        blabla.forEach(System.out::println);
+
         System.out.println("-----------------------------");
 
 
-        List<AirLine> gigi = airFrance.getAllCompanies();
         List<AirLine> gaga = airLineManager.getAirLinePool();
-        System.out.println(gaga.equals(gigi));
+
 
 
 

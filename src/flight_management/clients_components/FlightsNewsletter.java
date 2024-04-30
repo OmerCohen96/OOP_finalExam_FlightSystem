@@ -1,7 +1,6 @@
-package controlers.observer_components;
+package flight_management.clients_components;
 
-import controlers.Flight;
-import controlers.observer_components.FlightObserver;
+import flight_management.Flight;
 
 public interface FlightsNewsletter {
     void subscribe (FlightObserver observer);

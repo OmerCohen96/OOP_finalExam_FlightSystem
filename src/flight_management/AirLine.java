@@ -1,4 +1,4 @@
-package controlers;
+package flight_management;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,19 +33,19 @@ public abstract class AirLine {
         return companyName;
     }
 
-    // return the flights belonging to the current instance only (ignore descendants airlines flights)
-    // for inner use only
+//    Return the flights belonging to the current instance only.
+//    ignoring flights of descendant airlines. For internal use only.
     protected List<Flight> getInternalFlights() {
         return this.flights;
     }
 
-    public void addFlight(Flight... flightList) {
+    void addFlight(Flight... flightList) {
         for (Flight flight : flightList)
             if (!getAllFlights().contains(flight))
                 getInternalFlights().add(flight);
     }
 
-    public void removeFlight(Flight flight) {
+    void removeFlight(Flight flight) {
         flights.remove(flight);
     }
 
@@ -54,7 +54,7 @@ public abstract class AirLine {
     /*
       Those two functions are at the core of the Composite design pattern:
       the Composite (GroupAirLine) and the Leaf (SingularAirLine) classes inherit from this class
-      Each of these classes must implement these functions in their own way,
+      each of these classes must implement these functions in their own way,
       which is why they are abstract functions.
       The client doesn't need to worry about whether it's working with a big group company airline or a singular airline
      */
@@ -62,11 +62,11 @@ public abstract class AirLine {
     /**
      * @return - list of all descendant airline flights, including those of the current instance itself
      */
-    public abstract List<Flight> getAllFlights();
+    abstract List<Flight> getAllFlights();
 
     /** @return - list of all descendants airline companies, include the current instance itself
      */
-    public abstract List<AirLine> getAllCompanies();
+    abstract List<AirLine> getAllCompanies();
 
     //--------------------------------------------------------------------------------------------------//
 

@@ -1,4 +1,4 @@
-package controlers.observer_components;
+package flight_management.clients_components;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,7 +8,7 @@ public class Passenger implements FlightObserver {
     private String name, lastName;
     private List<Ticket> tickets;
 
-    private PassengerServiceFacade service;
+    private PassengerServiceFacade serviceFacade;
 
 
     public Passenger (int ID , String name, String lastName, PassengerServiceFacade bookingService){
@@ -16,22 +16,24 @@ public class Passenger implements FlightObserver {
         this.name = name;
         this.lastName = lastName;
         this.tickets = new ArrayList<>();
-        this.service = bookingService;
+        this.serviceFacade = bookingService;
     }
 
-    public PassengerServiceFacade getService(){
-        return service;
+    private PassengerServiceFacade getServiceFacade(){
+        return serviceFacade;
     }
-
     public List<Ticket> getTickets() {
         return tickets;
     }
-
     public void purchaseTicket (int flightSerialNumber){
-        Ticket newTicket = getService().purchaseTicket(flightSerialNumber, this);
+        Ticket newTicket = getServiceFacade().purchaseTicket(flightSerialNumber, this);
         if (newTicket == null)
-            System.out.println("fuck");
-        getTickets().add(newTicket);
+            System.out.println("No matching flight found.");
+        else
+            getTickets().add(newTicket);
+    }
+    public void searchFlight (){
+        getServiceFacade().searchFlight();
     }
 
     @Override

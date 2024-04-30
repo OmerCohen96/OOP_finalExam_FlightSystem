@@ -1,4 +1,4 @@
-package controlers;
+package flight_management;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,7 +35,7 @@ public class GroupAirLine extends AirLine {
 //    }                                                                               // with the current company flights
 
     @Override
-    public List<Flight> getAllFlights() {
+    List<Flight> getAllFlights() {
         if (this.subsidiary.size() == 0)
             return new ArrayList<>(getInternalFlights());
         else
@@ -44,7 +44,7 @@ public class GroupAirLine extends AirLine {
                             getInternalFlights().stream()).toList();                       // of the subsidiary air lines
     }
     @Override
-    public List<AirLine> getAllCompanies() {
+    List<AirLine> getAllCompanies() {
         List<AirLine> allAirlines = new ArrayList<>(List.of(this));
         if (this.subsidiary.size() > 0)
             allAirlines.addAll(getSubsidiary().stream().flatMap(

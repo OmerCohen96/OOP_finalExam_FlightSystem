@@ -7,31 +7,26 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
 /**
- the purpose of this class is to make it easier for client handle with times formats/object
- (wrapper class to LocalDataTime class
- the main pattern is to use delegation with LocalDateTime class)
-
- the second purpose is to
- convert the default date format used in time module
- to EUROPE format from Month/Day/Year to Day/Month/Year
- and make the use with dates more comfortable
-
+ The purpose of this class is to simplify client handling of time formats and objects.
+ It serves as a wrapper class for the LocalDateTime class, primarily utilizing delegation with the LocalDateTime class.
+<p>
+ The secondary purpose is to convert the default date format used in the time module to the EUROPE format,
+ changing from Month/Day/Year to Day/Month/Year, thus enhancing the usability of dates.
+ </p>
  */
 
 public class MyDate implements Comparable<MyDate> {
     public final static String FORMAT = "dd/MM/yyyy HH:mm";
 
+
     /**
-     * this method create MyDate instance from providing string input,
-     * the input should represent date or date and time.
-     *
-     * @notice:
-     * the string argument should be in this format -> "day/month/year hour:minute" or just "day/month/year",
-     * with numeric representation.
-     *
-     * this is the only way that the client can create an instance of this class.
-     * @param dateTime - string that represent the requirement date
-     * @return MyDate instance that represent date and time
+     This method creates a MyDate instance from a provided string input, which should represent a date or a date and time.
+     @notice:
+     The string argument should be in the format "day/month/year hour:minute" or just "day/month/year",
+     using numeric representation.
+     This is the only way for the client to create an instance of this class.
+     @param dateTime - String representing the required date
+     @return MyDate instance representing the date and time
      */
     public static MyDate of(String dateTime) {
         if (isValid(dateTime))
@@ -40,11 +35,12 @@ public class MyDate implements Comparable<MyDate> {
             throw new IllegalArgumentException(String.format("argument format should be in that format %s", FORMAT));
     }
 
+
     /**
-     * this function check if the provided String is a valid input for
-     * creating new instance of MyDate object.
-     * @param dateTime - String : the checked string
-     * @return true or false
+     This function checks if the provided String is a valid
+     input for creating a new instance of the MyDate object.
+     @param dateTime - String: the string being checked
+     @return true if the string is valid, otherwise false
      */
     public static boolean isValid(String dateTime) {
         String[] dateAndTime = dateTime.strip().split(" ");

@@ -1,9 +1,8 @@
-package controlers.observer_components;
+package flight_management.clients_components;
 
-import controlers.Flight;
+import flight_management.Flight;
 
 public class Ticket {
-
     private static int TICKET_NUMBER;
     private final int serialTicketNum;
     private final String flightInfo;
@@ -18,15 +17,15 @@ public class Ticket {
     }
 
     public void showDetails(){
-        System.out.println(getFlightInfo());
-    }
-
-    public String getFlightInfo() {
-        return "Ticket number: " + getSerialTicketNum() + "\n" + flightInfo;
+        System.out.println(ticketInfo());
     }
 
     @Override
     public String toString (){
-        return getFlightInfo();
+        return ticketInfo();
+    }
+
+    private String ticketInfo() {
+        return "Ticket number: " + getSerialTicketNum() + "\n" + flightInfo;
     }
 }

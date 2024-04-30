@@ -1,6 +1,6 @@
-package controlers.search_strategy_componnets;
+package flight_management.search_strategy_componnets;
 
-import controlers.Flight;
+import flight_management.Flight;
 
 import java.util.List;
 

@@ -1,17 +1,35 @@
-package controlers;
+package flight_management;
 
-import controlers.observer_components.*;
-import controlers.search_strategy_componnets.SearchEnum;
-import controlers.search_strategy_componnets.SearchFactory;
-import controlers.search_strategy_componnets.SearchStrategy;
+import flight_management.clients_components.*;
+import flight_management.search_strategy_componnets.SearchEnum;
+import flight_management.search_strategy_componnets.SearchFactory;
+import flight_management.search_strategy_componnets.SearchStrategy;
 import my_date_format.MyDate;
 
 import java.util.*;
 
+/**
+ * this class responsible for managing flights, flight bookings
+ * and notifications for passengers and flight observers.
+ * <p>
+ * this class utilizes the Singleton design pattern, meaning that it can be instantiated only once.
+ * since this project is intended for use in a single airport,
+ * I believe it's appropriate to ensure there is only one instance of it.
+ * <p>
+ * also, this class implements the FlightsNewsletter interface,
+ * allowing flight observers to subscribe and unsubscribe for updates.
+ * <p>
+ * if fact,
+ * This class acts as an observable component in the construction of the Observer design pattern.
+ * </p>
+ *
+ **/
+
 public class BookingManager implements FlightsNewsletter, PassengerServiceFacade {
 
-    private static BookingManager bookingManager = null;
+    private static BookingManager bookingManager = null; // the single object will be stored inside this field
 
+    //the "constructor" of the singleton
     public static BookingManager getInstance() {
         if (bookingManager == null)
             bookingManager = new BookingManager();
@@ -28,13 +46,9 @@ public class BookingManager implements FlightsNewsletter, PassengerServiceFacade
         this.flightObservers = new HashSet<>();
     }
 
-//    public void addNewFlight(Flight ... flights){
-//        getAirLineManager().addNewFlight(flights);
-//        for (Flight flight : flights){
-//            getMap().put(flight, new ArrayList<>());
-//        }
-//    }
-
+    /**
+     * recieve new flights
+     */
     public void addNewFlight(Flight ... flights){
         String compName;
         AirLine airLine;

@@ -1,4 +1,4 @@
-package controlers;
+package flight_management;
 
 import my_date_format.MyDate;
 
@@ -32,6 +32,7 @@ public class Flight {
         this.flight_code = SERIAL_NUMBER++;
     }
 
+    // overloading of the main constructor if for the option to insert dates in string format
     public Flight(String airLineName, String origin, String destination,
                   String departureTime, String arrivalTime, double price) {
         this(airLineName, origin, destination, MyDate.of(departureTime), MyDate.of(arrivalTime), price);
@@ -53,25 +54,29 @@ public class Flight {
         return departureTime;
     }
 
-    public void setDepartureTime(MyDate departureTime) {
-        this.departureTime = departureTime;
-    }
-
     public MyDate getArrivalTime() {
         return arrivalTime;
-    }
-
-    public void setArrivalTime(MyDate arrivalTime) {
-        this.arrivalTime = arrivalTime;
     }
 
     public double getPrice() {
         return price;
     }
 
-    public void setPrice(double price) {
+    // --------- Encapsulate setter methods with package-private access for use only by relevant classes ------
+
+    void setDepartureTime(MyDate departureTime) {
+        this.departureTime = departureTime;
+    }
+
+    void setArrivalTime(MyDate arrivalTime) {
+        this.arrivalTime = arrivalTime;
+    }
+
+    void setPrice(double price) {
         this.price = price;
     }
+
+    // -------- end scope --------------------------------------------------------------------------------------
 
     public int getFlight_code(){
         return this.flight_code;

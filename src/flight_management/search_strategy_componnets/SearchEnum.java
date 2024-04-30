@@ -1,4 +1,4 @@
-package controlers.search_strategy_componnets;
+package flight_management.search_strategy_componnets;
 
 public enum SearchEnum {
     BY_DATE,
