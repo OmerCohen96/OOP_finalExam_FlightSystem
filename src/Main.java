@@ -1,8 +1,8 @@
 import flights_manager.AirLineManager;
 import flights_manager.BookingManager;
-import flights_manager.airlines_component.Flight;
-import flights_manager.airlines_component.GroupAirLine;
-import flights_manager.airlines_component.SingularAirLine;
+import flights_manager.airlines_components.Flight;
+import flights_manager.airlines_components.GroupAirLine;
+import flights_manager.airlines_components.SingularAirLine;
 import flights_manager.client_handle.FlightObserver;
 import flights_manager.client_handle.Passenger;
 import my_date_format.MyDate;
@@ -104,7 +104,10 @@ public class Main {
 
         bookingManager.getAllFlights().stream().sorted(Comparator.comparingInt(Flight::getFlight_code)).
         forEach(System.out::println);
+
+        bookingManager.searchFlight();
     }
+
 
 
 

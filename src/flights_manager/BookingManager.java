@@ -1,13 +1,13 @@
 package flights_manager;
 
-import flights_manager.airlines_component.AirLine;
-import flights_manager.airlines_component.Flight;
+import flights_manager.airlines_components.AirLine;
+import flights_manager.airlines_components.Flight;
 import flights_manager.client_handle.FlightObserver;
 import flights_manager.client_handle.FlightsNewsletter;
 import flights_manager.client_handle.Passenger;
 import flights_manager.client_handle.Ticket;
 import flights_manager.search_strategies.SearchFactory;
-import flights_manager.search_strategies.SearchMethod;
+import flights_manager.search_strategies.SearchEnum;
 import flights_manager.search_strategies.SearchStrategy;
 import flights_manager.client_handle.PassengerServiceFacade;
 import my_date_format.MyDate;
@@ -66,12 +66,12 @@ public class BookingManager implements FlightsNewsletter, PassengerServiceFacade
 
     public void searchFlight (){
         Scanner scanner = new Scanner(System.in);
-        SearchMethod[] methods = SearchMethod.values();
-        List<SearchMethod> chosenMethods = new ArrayList<>();
+        SearchEnum[] methods = SearchEnum.values();
+        List<SearchEnum> chosenMethods = new ArrayList<>();
         System.out.println("Please indicate the categories you'd like to search by.\n" +
                 "Enter 'true' to include a category or 'false' to dismiss it");
         boolean isValid;
-        for (SearchMethod method : methods){
+        for (SearchEnum method : methods){
             System.out.printf("Search %s ?%n", method);
             isValid = false;
             while (!isValid) {
@@ -88,17 +88,17 @@ public class BookingManager implements FlightsNewsletter, PassengerServiceFacade
                 }
             }
         }
-        List<Flight> results = this.search(chosenMethods.toArray(SearchMethod[]::new));
+        List<Flight> results = this.searchFlight(chosenMethods.toArray(SearchEnum[]::new));
         if (results != null)
             results.forEach(System.out::println);
         else
             System.out.println("We couldn't find any matching flights. We apologize for the inconvenience.");
     }
 
-    private List<Flight> search(SearchMethod... searchMethods){
+    private List<Flight> searchFlight(SearchEnum... searchEnums){
         List<Flight> results = getAllFlights();
         SearchStrategy searchStrategy;
-        for (SearchMethod method : searchMethods){
+        for (SearchEnum method : searchEnums){
             searchStrategy = SearchFactory.generate(method);
             results = searchStrategy.search(results);
         }
@@ -115,7 +115,7 @@ public class BookingManager implements FlightsNewsletter, PassengerServiceFacade
             throw new NoSuchElementException("We couldn't find a flight with this serial number");
     }
 
-    private Flight getFlightByCode (int serialNumber){
+    public Flight getFlightByCode (int serialNumber){
         return getAllFlights().stream()
                 .filter(flight -> flight.getFlight_code() == serialNumber)
                 .findFirst().orElse(null);

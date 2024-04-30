@@ -1,6 +1,6 @@
 package flights_manager;
 
-import flights_manager.airlines_component.AirLine;
+import flights_manager.airlines_components.AirLine;
 
 import java.util.*;
 

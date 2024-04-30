@@ -1,4 +1,4 @@
-package flights_manager.airlines_component;
+package flights_manager.airlines_components;
 
 import java.util.ArrayList;
 import java.util.List;

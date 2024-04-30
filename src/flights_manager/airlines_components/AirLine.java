@@ -1,4 +1,4 @@
-package flights_manager.airlines_component;
+package flights_manager.airlines_components;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,11 +58,11 @@ public abstract class AirLine {
      */
 
     /**
-     * @return - list of all descendants airline flights include those of the current instance itself
+     * @return - list of all descendant airline flights, including those of the current instance itself
      */
     public abstract List<Flight> getAllFlights();
 
-    /** @return - list of all descendants airline include the company itself
+    /** @return - list of all descendants airline companies, include the current instance itself
      */
     public abstract List<AirLine> getAllCompanies();
 

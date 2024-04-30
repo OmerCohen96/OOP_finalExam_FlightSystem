@@ -2,7 +2,7 @@ package flights_manager.search_strategies;
 
 
 public class SearchFactory {
-    public static SearchStrategy generate(SearchMethod method) throws RuntimeException {
+    public static SearchStrategy generate(SearchEnum method) throws RuntimeException {
         switch (method){
             case BY_DATE:
                 return new ByDate();
