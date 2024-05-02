@@ -5,12 +5,17 @@ import flight_management.observer_components.FlightObserver;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Represents a passenger using the flight management system.
+ * Implements the Observer pattern to receive updates about flights.
+ */
+
 public class Passenger implements FlightObserver {
     private final int ID;
     private final String name;
     private final String lastName;
     private final List<Ticket> tickets;
-    private final PassengerServiceFacade serviceFacade;
+    private final PassengerServiceFacade serviceFacade; // Facade for accessing flight management services
 
     public Passenger (int ID , String name, String lastName, PassengerServiceFacade bookingManager){
         this.ID = ID;
@@ -20,6 +25,10 @@ public class Passenger implements FlightObserver {
         this.serviceFacade = bookingManager;
     }
 
+    /**
+     * Retrieves the facade for accessing flight management services.
+     * @return The facade for accessing flight management services.
+     */
     private PassengerServiceFacade getServiceFacade(){
         return serviceFacade;
     }
@@ -35,10 +44,12 @@ public class Passenger implements FlightObserver {
         }
         else {
             System.out.printf("""
+                    Hi %s %s
+                    
                     The purchase was completed successfully
-                    here is the flight info:
+                    here is the ticket info:
                     	 %s
-                    %n""", newTicket);
+                    %n""",name,lastName, newTicket);
             getTickets().add(newTicket);
         }
     }
@@ -47,6 +58,9 @@ public class Passenger implements FlightObserver {
         getServiceFacade().searchFlight();
     }
 
+    /**
+     * Subscribes to push notifications about any update about flights.
+     */
     public void getPushes(){
         getServiceFacade().subscribeToPushService(this);
     }
@@ -78,10 +92,10 @@ public class Passenger implements FlightObserver {
 
     @Override
     public String toString() {
-        return "Passenger{" +
-                "ID=" + ID +
-                ", name='" + name + '\'' +
-                ", lastName='" + lastName + '\'' +
-                '}';
+        return String.format("""
+                Passenger ID %d
+                Name: %s %s
+                purchase flight - %b
+                """, ID, name, lastName, !getTickets().isEmpty());
     }
 }

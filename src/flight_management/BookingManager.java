@@ -30,36 +30,49 @@ import java.util.*;
 
 public class BookingManager implements PassengerServiceFacade, WorkerServiceFacade {
 
-    private static BookingManager bookingManager = null; // the single object will be stored inside this field
+    private static BookingManager bookingManager = null; // Singleton instance of BookingManager
 
-    //the "constructor" of the singleton
+    /**
+     * Retrieves the singleton instance of BookingManager.
+     * @return The singleton instance of BookingManager.
+     */
     public static BookingManager getInstance() {
         if (bookingManager == null)
             bookingManager = new BookingManager();
         return bookingManager;
     }
 
-    final AirLineManager airLineManager;
-    final Map<Flight, List<Passenger>> flightsBook;
-    final private FlightsNewsletterInterface newsUpdater;
 
+    final AirLineManager airLineManager; // Manages airline operations
+    final Map<Flight, List<Passenger>> flightsBook; // Stores booked flights and associated passengers
+    final private FlightsNewsletterInterface newsUpdater; //component that handle of updates for subscribers about flight news
+
+    /**
+     * Private constructor to enforce singleton pattern.
+     */
     private BookingManager (){
         this.airLineManager = AirLineManager.getInstance();
         this.flightsBook = new HashMap<>();
         this.newsUpdater = new FlightsNewsUpdater();
     }
 
+    //---------------------- handle with flights-----------------------------------------
     public void addNewFlight(Flight ... flights){
         String compName;
         AirLine airLine;
         for (Flight flight : flights){
             compName = flight.getCompName();
-            airLine = getAirLineManager().findAirLineComponent(compName);
+            airLine = airLineManager.findAirLineComponent(compName); // Find the airline component based on flight's company name
             if (airLine != null){
-                airLine.addFlight(flight);
+                airLine.addFlight(flight); // Add flight to the airline
                 if (!getFlightsBook().containsKey(flight)){
-                    getFlightsBook().put(flight, new ArrayList<>());
-                    // TODO: 24/04/2024 add notify fo observers
+                    getFlightsBook().put(flight, new ArrayList<>()); // Initialize passenger list for the new flight
+                    String message = String.format("""
+                            "New flight arrival!"
+                            
+                            %s
+                            """, flight);
+                    getNewsUpdater().notifyAllObserver(message); // Notify all subscribers about the new flight
                 }
             } else {
                 throw new NoSuchElementException(
@@ -72,27 +85,9 @@ public class BookingManager implements PassengerServiceFacade, WorkerServiceFaca
         }
     }
 
-    @Override
-    public void subscribeToPushService(FlightObserver observer) {
-        getNewsUpdater().subscribe(observer);
-    }
-
-    @Override
-    public void unsubscribeFromPushService(FlightObserver observer) {
-        getNewsUpdater().unsubscribe(observer);
-    }
-
-    public List<Flight> searchFlight(SearchEnum... searchEnums){
-        List<Flight> results = getAllFlights();
-        SearchStrategy searchStrategy;
-        for (SearchEnum method : searchEnums){
-            searchStrategy = SearchFactory.generate(method);
-            results = searchStrategy.search(results);
-        }
-        return results;
-    }
-
-    @Override
+    /**
+     * Searches for flights based on user input.
+     */
     public void searchFlight (){
         Scanner scanner = new Scanner(System.in);
         SearchEnum[] methods = SearchEnum.values();
@@ -108,7 +103,7 @@ public class BookingManager implements PassengerServiceFacade, WorkerServiceFaca
                 {
                     boolean answer = scanner.nextBoolean();
                     if (answer)
-                        chosenMethods.add(method);
+                        chosenMethods.add(method); // Add the chosen search enum that describe desire algorithm
                     isValid = true;
                 }
                 catch (IllegalArgumentException | InputMismatchException e)
@@ -119,46 +114,67 @@ public class BookingManager implements PassengerServiceFacade, WorkerServiceFaca
                 }
             }
         }
-        List<Flight> results = this.searchFlight(chosenMethods.toArray(SearchEnum[]::new));
-        if (results != null)
-            results.forEach(System.out::println);
-        else
-            System.out.println("We couldn't find any matching flights. We apologize for the inconvenience.");
-    }
-
-    @Override
-    public Ticket purchaseTicket (int flightSerialNumber, Passenger passenger){
-        Flight flight = getFlightByCode(flightSerialNumber);
-        if (flight != null) {
-            addPassenger(flight, passenger);
-            return new Ticket(flight);
+        List<Flight> results = this.searchFlight(chosenMethods.toArray(SearchEnum[]::new)); // Perform search based on chosen methods
+        if (!results.isEmpty()) {
+            System.out.println("MATCHING RESULTS: \n");
+            results.forEach(System.out::println); // Print search results
+            System.out.println("END RESULTS\n");
+        }else {
+            System.out.println("We couldn't find any matching flights. We apologize for the inconvenience.\n");
         }
-        else
-            throw new NoSuchElementException("We couldn't find a flight with this serial number");
     }
 
+    /**
+     * Searches for flights based on specified search criteria.
+     * @param searchEnums The search criteria.
+     * @return A list of flights matching the search criteria.
+     */
+    public List<Flight> searchFlight(SearchEnum... searchEnums){
+        List<Flight> results = getAllFlights();
+        SearchStrategy searchStrategy;
+        for (SearchEnum method : searchEnums){
+            searchStrategy = SearchFactory.generate(method);// Generate search strategy based on chosen method
+            results = searchStrategy.search(results);
+        }
+        return results;
+    }
+
+    /**
+     * Retrieves a flight by its serial number.
+     * @param serialNumber The serial number of the flight.
+     * @return The flight with the specified serial number, or null if not found.
+     */
     public Flight getFlightByCode (int serialNumber){
         return getAllFlights().stream()
                 .filter(flight -> flight.getFlight_code() == serialNumber)
                 .findFirst().orElse(null);
     }
 
-    public void addPassenger(Flight flight , Passenger passenger){
-        getFlightsBook().get(flight).add(passenger);
-    }
-
-    private Map<Flight , List<Passenger>> getFlightsBook(){
-        return this.flightsBook;
-    }
-
+    /**
+     * Retrieves all flights.
+     * @return A list of all flights.
+     */
     public List<Flight> getAllFlights (){
-        return getAirLineManager().getAirLineGroups().stream()
+        return airLineManager.getAirLineGroups().stream()
                 .flatMap(airLine -> airLine.getAllFlights().stream())
                 .toList();
     }
 
-    private AirLineManager getAirLineManager(){
-        return this.airLineManager;
+    public void deleteFlight(Flight flight){
+        String canceledFlight = flight.toString();
+        String message = String.format(
+                """
+                        Flight number: #%d
+                        with this details:
+
+                        %s\t\tHas been canceled. We apologize for the inconvenience.""",
+                flight.getFlight_code(), canceledFlight
+        );
+        AirLine airLine = airLineManager.findAirLineComponent(flight.getCompName());
+        getNewsUpdater().notifyAllObserver(getFlightsBook().get(flight), message);// Notify all passengers about flight cancellation
+        getNewsUpdater().notifyAllObserver(message);// Notify all subscribers about flight cancellation
+        airLine.removeFlight(flight);// Remove flight from the airline
+        getFlightsBook().remove(flight);// Remove flight booking details
     }
 
     public void updateTimeFlight (Flight flight, MyDate newDepartTime, MyDate newArrvlTime){
@@ -178,31 +194,53 @@ public class BookingManager implements PassengerServiceFacade, WorkerServiceFaca
                         The time of flight number #%d to %s has been changed.
                         %s
                         """
-                            , flight.getFlight_code(),flight.getDestination(), messageBuilder);
-        getNewsUpdater().notifyAllObserver(getFlightsBook().get(flight), message);
-        getNewsUpdater().notifyAllObserver(message);
+                , flight.getFlight_code(),flight.getDestination(), messageBuilder);
+        getNewsUpdater().notifyAllObserver(getFlightsBook().get(flight), message); // Notify all passengers about flight cancellation
+        getNewsUpdater().notifyAllObserver(message); // Notify all subscribers about flight cancellation
     }
+
     public void updateTimeFlight (Flight flight, MyDate newDepartTime){
         updateTimeFlight(flight, newDepartTime, flight.getArrivalTime());
     }
 
-    public void deleteFlight(Flight flight){
-        String canceledFlight = flight.toString();
-        String message = String.format(
-                """
-                        Flight number: #%d
-                        with this details:
+    private Map<Flight , List<Passenger>> getFlightsBook(){
+        return this.flightsBook;
+    }
+//-----------------------------------------------------------------------------------------------------------------
 
-                        %s\t\tHas been canceled. We apologize for the inconvenience.""",
-                flight.getFlight_code(), canceledFlight
-        );
-        AirLine airLine = getAirLineManager().findAirLineComponent(flight.getCompName());
-        getNewsUpdater().notifyAllObserver(getFlightsBook().get(flight), message);
-        getNewsUpdater().notifyAllObserver(message);
-        airLine.removeFlight(flight);
-        getFlightsBook().remove(flight);
+    // -------------------------------------- API of operation to passenger--------------------------------------
+    /**
+     * Purchases a ticket for a passenger for the specified flight.
+     * @param flightSerialNumber The serial number of the flight.
+     * @param passenger The passenger purchasing the ticket.
+     * @return The ticket purchased.
+     * @throws NoSuchElementException If the specified flight is not found.
+     */
+    public Ticket purchaseTicket (int flightSerialNumber, Passenger passenger){
+        Flight flight = getFlightByCode(flightSerialNumber);
+        if (flight != null) {
+            addPassenger(flight, passenger);
+            return new Ticket(flight);
+        }
+        else
+            throw new NoSuchElementException("We couldn't find a flight with this serial number");
     }
 
+    private void addPassenger(Flight flight , Passenger passenger){
+        getFlightsBook().get(flight).add(passenger);
+    }
+    @Override
+    public void subscribeToPushService(FlightObserver observer) {
+        getNewsUpdater().subscribe(observer);
+    }
+    @Override
+    public void unsubscribeFromPushService(FlightObserver observer) {
+        getNewsUpdater().unsubscribe(observer);
+    }
+
+//-----------------------------------------------------------------------------------------------------------------
+
+    // Get all passengers booked on flights
     public List<Passenger> getAllPassengers(){
         return getFlightsBook().values().stream().flatMap(Collection::stream).distinct().toList();
     }

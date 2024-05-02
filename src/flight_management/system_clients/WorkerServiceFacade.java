@@ -14,6 +14,5 @@ public interface WorkerServiceFacade {
     void searchFlight ();
     void updateTimeFlight (Flight flight, MyDate newDepartTime, MyDate newArrvlTime);
     void updateTimeFlight (Flight flight, MyDate newDepartTime);
-    void addPassenger(Flight flight , Passenger passenger);
     void deleteFlight(Flight flight);
 }

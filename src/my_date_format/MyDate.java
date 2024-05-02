@@ -72,24 +72,6 @@ public class MyDate implements Comparable<MyDate> {
         return false;
     }
 
-//    private static boolean checkValidationToDate2(String[] dateStr) {
-//        String[] date = dateStr[0].strip().split("[;/.,-]");
-//        if (date.length == 3) {
-//            // check if every String element represent a valid number
-//            for (String num : date)
-//                try {
-//                    Integer.parseInt(num);
-//                } catch (NumberFormatException o) {
-//                    return false;
-//                }
-//            // check if the year section represent valid year
-//            int year = Integer.parseInt(date[2]);
-//            if ((year < 100 && year > 0) || (year > 2000 && year < 2100))
-//                return true;
-//        }
-//        return false;
-//    }
-
     private static boolean checkValidationToDate(String[] dateStr) {
         String[] date = dateStr[0].strip().split("[;/.,-]");
         if (date.length == 3) {

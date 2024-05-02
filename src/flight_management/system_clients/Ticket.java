@@ -25,7 +25,6 @@ public class Ticket {
     public void showDetails(){
         System.out.println(ticketInfo());
     }
-
     @Override
     public String toString (){
         return ticketInfo();

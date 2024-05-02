@@ -112,6 +112,10 @@ public class AirPortSystem {
         getBookingManager().subscribeToPushService(worker);
     }
 
+    public List<Worker> getWorkers() {
+        return workers;
+    }
+
     public AirLineManager getAirLineManager() {
         return airLineManager;
     }
