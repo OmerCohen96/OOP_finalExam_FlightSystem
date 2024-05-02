@@ -1,6 +1,9 @@
 package flight_management;
 
-import flight_management.clients_components.*;
+import flight_management.system_clients.*;
+import flight_management.observer_components.FlightObserver;
+import flight_management.observer_components.FlightsNewsUpdater;
+import flight_management.observer_components.FlightsNewsletterInterface;
 import flight_management.search_strategy_componnets.SearchEnum;
 import flight_management.search_strategy_componnets.SearchFactory;
 import flight_management.search_strategy_componnets.SearchStrategy;
@@ -25,7 +28,7 @@ import java.util.*;
  *
  **/
 
-public class BookingManager implements FlightsNewsletter, PassengerServiceFacade {
+public class BookingManager implements PassengerServiceFacade, WorkerServiceFacade {
 
     private static BookingManager bookingManager = null; // the single object will be stored inside this field
 
@@ -38,17 +41,14 @@ public class BookingManager implements FlightsNewsletter, PassengerServiceFacade
 
     final AirLineManager airLineManager;
     final Map<Flight, List<Passenger>> flightsBook;
-    final private Set<FlightObserver> flightObservers;
+    final private FlightsNewsletterInterface newsUpdater;
 
     private BookingManager (){
         this.airLineManager = AirLineManager.getInstance();
         this.flightsBook = new HashMap<>();
-        this.flightObservers = new HashSet<>();
+        this.newsUpdater = new FlightsNewsUpdater();
     }
 
-    /**
-     * recieve new flights
-     */
     public void addNewFlight(Flight ... flights){
         String compName;
         AirLine airLine;
@@ -57,8 +57,8 @@ public class BookingManager implements FlightsNewsletter, PassengerServiceFacade
             airLine = getAirLineManager().findAirLineComponent(compName);
             if (airLine != null){
                 airLine.addFlight(flight);
-                if (!getMap().containsKey(flight)){
-                    getMap().put(flight, new ArrayList<>());
+                if (!getFlightsBook().containsKey(flight)){
+                    getFlightsBook().put(flight, new ArrayList<>());
                     // TODO: 24/04/2024 add notify fo observers
                 }
             } else {
@@ -72,6 +72,27 @@ public class BookingManager implements FlightsNewsletter, PassengerServiceFacade
         }
     }
 
+    @Override
+    public void subscribeToPushService(FlightObserver observer) {
+        getNewsUpdater().subscribe(observer);
+    }
+
+    @Override
+    public void unsubscribeFromPushService(FlightObserver observer) {
+        getNewsUpdater().unsubscribe(observer);
+    }
+
+    public List<Flight> searchFlight(SearchEnum... searchEnums){
+        List<Flight> results = getAllFlights();
+        SearchStrategy searchStrategy;
+        for (SearchEnum method : searchEnums){
+            searchStrategy = SearchFactory.generate(method);
+            results = searchStrategy.search(results);
+        }
+        return results;
+    }
+
+    @Override
     public void searchFlight (){
         Scanner scanner = new Scanner(System.in);
         SearchEnum[] methods = SearchEnum.values();
@@ -85,14 +106,16 @@ public class BookingManager implements FlightsNewsletter, PassengerServiceFacade
             while (!isValid) {
                 try
                 {
-                    if (scanner.nextBoolean())
+                    boolean answer = scanner.nextBoolean();
+                    if (answer)
                         chosenMethods.add(method);
                     isValid = true;
                 }
-                catch (NoSuchElementException o)
+                catch (IllegalArgumentException | InputMismatchException e)
                 {
                     System.out.println("Please follow the instructions \n" +
-                            "Enter 'true' to include a category or 'false' to dismiss it.");
+                            "Write 'true' to include the suggested category above or 'false' to dismiss it.");
+                    scanner.nextLine();
                 }
             }
         }
@@ -103,16 +126,7 @@ public class BookingManager implements FlightsNewsletter, PassengerServiceFacade
             System.out.println("We couldn't find any matching flights. We apologize for the inconvenience.");
     }
 
-    private List<Flight> searchFlight(SearchEnum... searchEnums){
-        List<Flight> results = getAllFlights();
-        SearchStrategy searchStrategy;
-        for (SearchEnum method : searchEnums){
-            searchStrategy = SearchFactory.generate(method);
-            results = searchStrategy.search(results);
-        }
-        return results;
-    }
-
+    @Override
     public Ticket purchaseTicket (int flightSerialNumber, Passenger passenger){
         Flight flight = getFlightByCode(flightSerialNumber);
         if (flight != null) {
@@ -128,11 +142,12 @@ public class BookingManager implements FlightsNewsletter, PassengerServiceFacade
                 .filter(flight -> flight.getFlight_code() == serialNumber)
                 .findFirst().orElse(null);
     }
+
     public void addPassenger(Flight flight , Passenger passenger){
-        getMap().get(flight).add(passenger);
+        getFlightsBook().get(flight).add(passenger);
     }
 
-    private Map<Flight , List<Passenger>> getMap (){
+    private Map<Flight , List<Passenger>> getFlightsBook(){
         return this.flightsBook;
     }
 
@@ -146,60 +161,53 @@ public class BookingManager implements FlightsNewsletter, PassengerServiceFacade
         return this.airLineManager;
     }
 
-    // TODO: 24/04/2024 more detailed
     public void updateTimeFlight (Flight flight, MyDate newDepartTime, MyDate newArrvlTime){
         String oldFlight = flight.toString();
-        if (!flight.getDepartureTime().equals(newDepartTime))
+        String oldDeparture = flight.getDepartureTime().toString();
+        String oldArriving = flight.getArrivalTime().toString();
+        String messageBuilder = "";
+        if (!flight.getDepartureTime().equals(newDepartTime)) {
             flight.setDepartureTime(newDepartTime);
-        if (!flight.getArrivalTime().equals(newArrvlTime))
+            messageBuilder += String.format("From departure at %s to departure at %s\n", oldDeparture, newDepartTime);
+        }
+        if (!flight.getArrivalTime().equals(newArrvlTime)) {
             flight.setArrivalTime(newArrvlTime);
-        String message = String.format( // TODO: 24/04/2024  expaned the message
-                "the time of flight number #%d has been changed", flight.getFlight_code());
-        notifyAllPassengers(flight, message);
-        notifyAllObserver(message);
-
+            messageBuilder += String.format("From Arrival time at %s to Arrival at %s\n", oldArriving, newArrvlTime);
+        }
+        String message = String.format("""
+                        The time of flight number #%d to %s has been changed.
+                        %s
+                        """
+                            , flight.getFlight_code(),flight.getDestination(), messageBuilder);
+        getNewsUpdater().notifyAllObserver(getFlightsBook().get(flight), message);
+        getNewsUpdater().notifyAllObserver(message);
     }
-
     public void updateTimeFlight (Flight flight, MyDate newDepartTime){
         updateTimeFlight(flight, newDepartTime, flight.getArrivalTime());
     }
 
-    // TODO: 24/04/2024
-    public void cancelFlight (Flight flight){
+    public void deleteFlight(Flight flight){
         String canceledFlight = flight.toString();
         String message = String.format(
-                "Flight details:\n%s\thas been canceled, we sorry", canceledFlight
+                """
+                        Flight number: #%d
+                        with this details:
+
+                        %s\t\tHas been canceled. We apologize for the inconvenience.""",
+                flight.getFlight_code(), canceledFlight
         );
         AirLine airLine = getAirLineManager().findAirLineComponent(flight.getCompName());
-        notifyAllPassengers(flight,message);
-        notifyAllObserver(message);
+        getNewsUpdater().notifyAllObserver(getFlightsBook().get(flight), message);
+        getNewsUpdater().notifyAllObserver(message);
         airLine.removeFlight(flight);
-        getMap().remove(flight);
+        getFlightsBook().remove(flight);
     }
 
-    private Set<FlightObserver> getFlightObservers(){
-        return this.flightObservers;
+    public List<Passenger> getAllPassengers(){
+        return getFlightsBook().values().stream().flatMap(Collection::stream).distinct().toList();
     }
 
-    @Override
-    public void subscribe(FlightObserver observer) {
-        getFlightObservers().add(observer);
-    }
-
-    @Override
-    public void unsubscribe(FlightObserver observer) {
-        getFlightObservers().remove(observer);
-    }
-
-    @Override
-    public void notifyAllObserver(String message) {
-        for (FlightObserver observer : getFlightObservers())
-            observer.update(message);
-    }
-
-    @Override
-    public void notifyAllPassengers(Flight flight, String message) {
-        for (Passenger passenger : getMap().get(flight))
-            passenger.update(message);
+    private FlightsNewsletterInterface getNewsUpdater() {
+        return newsUpdater;
     }
 }

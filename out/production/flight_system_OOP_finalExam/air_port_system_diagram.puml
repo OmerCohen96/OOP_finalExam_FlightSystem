@@ -1,24 +1,50 @@
 @startuml
 'https://plantuml.com/sequence-diagram
-
-SearchFactory *-- SearchStrategy
+BookingManager --> Passenger
+FlightObserver <|.. Passenger
+Passenger --> Ticket
+Passenger --* PassengersServiceFacade
+PassengersServiceFacade <|.. BookingManager
+SearchFactory *- SearchStrategy
 SearchStrategy <|.. byPrice
 SearchStrategy <|.. byDestination
 SearchStrategy <|.. byDate
-SearchFactory -right-o BookingManager
-BookingManager *-- AirLineManager
-AirLineManager o- AirLine
+SearchFactory <.. BookingManager
+BookingManager --* AirLineManager
+AirLineManager --> AirLine
 AirLine <|-- GroupAirLine
-GroupAirLine o- AirLine
+AirLine <-- GroupAirLine
 AirLine <|-- SingularAirLine
-AirLine o-- Flight
+AirLine --> Flight
 Flight *-- MyDate
+Flight <-- BookingManager
+
+class Ticket {
+flight
+ticket
+}
+
+interface FlightObserver{
+    +update()
+}
 
 interface SearchStrategy<<Strategy>>{
     +search (Flights): matchingFlights
 }
 
-class SearchFactory <<static>>{
+
+class Passenger<<user>>{
+    -name
+    -ID
+    -ServiceFacade
+    -tickets []
+    + purchaseTicket()
+    +searchFlight()
+    +getPushes()
+    +gettersToFields()
+}
+
+class SearchFactory <<static class>>{
     +{static}generate(): searchStrategy
 }
 
@@ -26,13 +52,19 @@ class byPrice <<concStrategy>>
 class byDestination <<concStrategy>>
 class byDate <<concStrategy>>
 
+interface PassengersServiceFacade<<Facade>>{
+    +{abstract}purchaseTicket()
+    +{abstract}searchFlight()
+    +{abstract}subscribePushes()
+    +{abstract}unsubscribePushes()
+}
+
 class BookingManager <<Singleton>>{
     -AirLineManager
-    -Map<Flight,Passengers[ ]> flightsBook
-    -flightObservers [ ]
+    -map flightsBook
+    -flightsNewsLetter
     +addNewFlight()
     +searchFlight()
-    -search(searchMethod)
     +purchaseTicket()
 }
 
