@@ -209,7 +209,11 @@ public class AirPortSystem {
 
         // workers can perform operations described in the WorkerServiceFacade.
         // he just needs to call to getWorkerService function.
-        tomas.getWorkerService();
+        //example for worker change flight time
+        tomas.getWorkerService().updateTimeFlight(
+                tomas.getWorkerService().getFlightByCode(1), // getting desire flight
+                MyDate.of("18/9/24 16:48"), MyDate.of("19/9/24 22:50")
+        );
 
 // -------------------------------------------- testing zone ---------------------------------------------------------
 

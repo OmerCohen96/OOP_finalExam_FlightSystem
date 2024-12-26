@@ -211,6 +211,7 @@ public class BookingManager implements PassengerServiceFacade, WorkerServiceFaca
     // -------------------------------------- API of operation to passenger--------------------------------------
     /**
      * Purchases a ticket for a passenger for the specified flight.
+     * Then, he is registered in the flight booking map
      * @param flightSerialNumber The serial number of the flight.
      * @param passenger The passenger purchasing the ticket.
      * @return The ticket purchased.
@@ -219,7 +220,7 @@ public class BookingManager implements PassengerServiceFacade, WorkerServiceFaca
     public Ticket purchaseTicket (int flightSerialNumber, Passenger passenger){
         Flight flight = getFlightByCode(flightSerialNumber);
         if (flight != null) {
-            addPassenger(flight, passenger);
+            addPassenger(flight, passenger); // The passenger is then registered in the flight booking map, associated with his flight.
             return new Ticket(flight);
         }
         else

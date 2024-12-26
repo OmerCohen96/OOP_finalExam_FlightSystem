@@ -1,0 +1,53 @@
+# Java build directory
+/bin/
+/out/
+
+# IntelliJ IDEA project files
+/.idea/
+/*.iml
+
+# Gradle build artifacts
+/.gradle/
+/build/
+
+# Maven target directory
+/target/
+
+# Logs
+*.log
+*.tmp
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.class
+*.war
+*.ear
+
+# Eclipse IDE files
+/.classpath
+/.project
+/.settings/
+
+# Generated files
+*.jar
+*.generated/
+
+# Tool-specific files
+/yarn-error.log
+npm-debug.log
+node_modules/
+
+# Credentials/Secrets
+*.env
+*.key
+
+# Others
+*.swp
+*.bak
+*.orig
+
+# Ignore idea misc.xml if needed
+.idea/misc.xml

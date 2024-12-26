@@ -22,18 +22,6 @@ public class GroupAirLine extends AirLine {
     private List<AirLine> getSubsidiary(){
         return this.subsidiary;
     }
-
-    // TODO: 20/04/2024 check for better ways
-//    @Override
-//    public List<Flight> getAllFlights() {
-//        if (this.subsidiary.size() == 0)
-//            return new ArrayList<>(getInternalFlights());
-//        else
-//            return Stream.concat(getAllCompanies().stream().filter(
-//                    x -> !x.equals(this)).flatMap( x -> x.getAllFlights().stream()), // concat all the flights of
-//                    getInternalFlights().stream()).toList();                       // of the subsidiary air lines
-//    }                                                                               // with the current company flights
-
     @Override
     List<Flight> getAllFlights() {
         if (this.subsidiary.size() == 0)

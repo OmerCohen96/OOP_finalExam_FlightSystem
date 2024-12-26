@@ -37,6 +37,9 @@ public class Passenger implements FlightObserver {
         return tickets;
     }
 
+    /**
+     * If the passenger purchases a ticket, they are registered in the booking manager.
+     */
     public void purchaseTicket (int flightSerialNumber){
         Ticket newTicket = getServiceFacade().purchaseTicket(flightSerialNumber, this);
         if (newTicket == null) {
